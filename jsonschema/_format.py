@@ -115,12 +115,15 @@ def _checks_drafts(both=None, draft3=None, draft4=None, raises=()):
         return func
     return wrap
 
+_has_atsign = re.compile(r"^.*@.*")
 
 @_checks_drafts("email")
 def is_email(instance):
     if not isinstance(instance, str_types):
         return True
-    return "@" in instance
+    if _has_atsign.match(instance):
+        local_part, domain = instance.split("@", 1)
+        return is_host_name(domain) or is_ipv4(domain)
 
 
 _ipv4_re = re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
